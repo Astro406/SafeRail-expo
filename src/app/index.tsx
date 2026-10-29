@@ -1,98 +1,117 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '@/context/AuthContext';
+import { AppBrandLogo } from '@/components/AppBrandLogo';
+import { AppColors } from '@/theme/colors';
+import { AppConstants } from '@/constants/AppConstants';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function SplashScreen() {
+  const router = useRouter();
+  const { user, isInitialized } = useAuth();
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const timer = setTimeout(() => {
+      if (user) {
+        router.replace('/dashboard');
+      } else {
+        router.replace('/(auth)/login');
+      }
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [isInitialized, user, router]);
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#070B16', '#0E172B', '#14203D']}
+        style={StyleSheet.absoluteFill}
+      />
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+      <View style={styles.centerContent}>
+        <AppBrandLogo size="lg" showSubtitle={false} />
+        <Text style={styles.subtitle}>{AppConstants.appTagline}</Text>
+        <Text style={styles.descriptor}>
+          Integrated Confirmatory Gas Screening & RailGuard AI Surveillance
+        </Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={AppColors.primaryCyan} />
+          <Text style={styles.loadingText}>Loading security protocols...</Text>
+        </View>
+      </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      <View style={styles.footer}>
+        <Text style={styles.versionText}>
+          {AppConstants.appName} v{AppConstants.appVersion}
+        </Text>
+        <Text style={styles.disclaimerText}>
+          Confirmatory Handheld Screening Tool • SOP Compliance Required
+        </Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+    backgroundColor: AppColors.background,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  centerContent: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  title: {
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: AppColors.primaryCyan,
+    marginTop: 20,
+    letterSpacing: 0.8,
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
+  descriptor: {
+    fontSize: 12,
+    color: AppColors.textSecondary,
+    textAlign: 'center',
+    marginTop: 8,
+    maxWidth: 280,
+    lineHeight: 18,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 36,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: AppColors.textMuted,
+    fontWeight: '500',
+  },
+  footer: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  versionText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: AppColors.textSecondary,
+    letterSpacing: 0.5,
+  },
+  disclaimerText: {
+    fontSize: 10,
+    color: AppColors.textMuted,
+    textAlign: 'center',
+    maxWidth: 260,
   },
 });

@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "mobile-expo",
-    "slug": "mobile-expo",
+    "name": "RailSafe AI",
+    "slug": "railsafe-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobileexpo",
-    "userInterfaceStyle": "automatic",
+    "scheme": "railsafe",
+    "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon"
     },
